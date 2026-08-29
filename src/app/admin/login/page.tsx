@@ -97,12 +97,46 @@ export default function AdminLoginPage() {
             </button>
           </form>
 
-          <p style={{ textAlign: 'center', marginTop: '1.25rem', fontSize: '0.8rem', color: '#94a3b8' }}>
-            Default: admin@shuddho.com / Admin@123456
-          </p>
+          {/* Quick Demo Login Buttons */}
+          <div style={{ marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: '1px solid #f1f5f9' }}>
+            <div style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: '#64748b', letterSpacing: '0.05em', marginBottom: '0.75rem', textAlign: 'center' }}>
+              ⚡ 1-Click Quick Demo Login
+            </div>
+            
+            <button
+              type="button"
+              onClick={() => {
+                setForm({ email: 'admin@shuddho.com', password: 'Admin@123456' })
+                toast.success('Admin credentials filled!')
+              }}
+              style={{
+                width: '100%',
+                padding: '0.65rem 1rem',
+                borderRadius: '0.75rem',
+                border: '1.5px dashed #16a34a',
+                background: '#f0fdf4',
+                color: '#15803d',
+                fontWeight: 600,
+                fontSize: '0.825rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: '0.5rem',
+                transition: 'all 0.15s',
+              }}
+            >
+              <span>👑 Super Admin Demo</span>
+              <span style={{ fontSize: '0.75rem', opacity: 0.8 }}>admin@shuddho.com</span>
+            </button>
+
+            <div style={{ background: '#f8fafc', padding: '0.6rem 0.8rem', borderRadius: '0.5rem', fontSize: '0.75rem', color: '#475569', textAlign: 'center', border: '1px solid #e2e8f0' }}>
+              Password: <strong style={{ color: '#0f172a' }}>Admin@123456</strong>
+            </div>
+          </div>
         </div>
 
-        <p style={{ textAlign: 'center', marginTop: '1.5rem', color: '#475569', fontSize: '0.8rem' }}>
+        <p style={{ textAlign: 'center', marginTop: '1.5rem', color: '#64748b', fontSize: '0.8rem' }}>
           © {new Date().getFullYear()} ShuddhoBazar. All rights reserved.
         </p>
       </div>

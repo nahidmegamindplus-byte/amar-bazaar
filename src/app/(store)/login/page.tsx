@@ -106,6 +106,42 @@ export default function CustomerLoginPage() {
           </button>
         </form>
 
+        {/* 1-Click Demo Login Options */}
+        <div className="pt-3 border-t border-slate-100 space-y-2">
+          <div className="text-center text-[11px] font-bold uppercase tracking-wider text-slate-400">
+            ⚡ Quick Demo Accounts (ওয়ান-ক্লিক ডেমো লগইন)
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setIdentifier('user@shuddho.com')
+                setPassword('User@123456')
+                toast.success('Customer demo credentials filled!')
+              }}
+              className="p-2.5 rounded-xl border border-dashed border-emerald-500 bg-emerald-50/60 hover:bg-emerald-100/60 text-left transition-colors cursor-pointer"
+            >
+              <div className="text-xs font-bold text-emerald-800">🛍️ Demo Customer</div>
+              <div className="text-[11px] text-emerald-600">user@shuddho.com</div>
+              <div className="text-[10px] text-slate-400">Pass: User@123456</div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setIdentifier('admin@shuddho.com')
+                setPassword('Admin@123456')
+                toast.success('Admin demo credentials filled!')
+              }}
+              className="p-2.5 rounded-xl border border-dashed border-amber-500 bg-amber-50/60 hover:bg-amber-100/60 text-left transition-colors cursor-pointer"
+            >
+              <div className="text-xs font-bold text-amber-800">👑 Demo Admin</div>
+              <div className="text-[11px] text-amber-600">admin@shuddho.com</div>
+              <div className="text-[10px] text-slate-400">Pass: Admin@123456</div>
+            </button>
+          </div>
+        </div>
+
         <div className="text-center pt-2 border-t border-slate-100 text-xs text-slate-500">
           Don’t have an account yet?{' '}
           <Link href="/register" className="font-bold text-emerald-600 hover:underline">
