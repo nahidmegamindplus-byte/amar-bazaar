@@ -512,8 +512,8 @@ export default function StoreLayoutClient({ children, branding, categories }: St
         </a>
       )}
 
-      {/* Mobile Bottom Nav */}
-      <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: '#fff', borderTop: '1px solid #e2e8f0', display: 'flex', zIndex: 90, padding: '0.5rem 0' }} className="mobile-bottom-nav">
+      {/* Mobile Bottom Nav (Strictly mobile only, hidden on computer) */}
+      <nav className="mobile-bottom-nav">
         {[
           { label: 'Home', href: '/', icon: Home },
           { label: 'Shop', href: '/shop', icon: Package },

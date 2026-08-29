@@ -280,9 +280,28 @@ body {
 .stars { display: inline-flex; gap: 0.1rem; }
 .star { width: 1rem; height: 1rem; }
 
-/* Mobile bottom nav spacing */
+/* Mobile bottom nav spacing & display */
+.mobile-bottom-nav {
+  display: none !important;
+}
 @media (max-width: 767px) {
   body { padding-bottom: 4.5rem; }
+  .mobile-bottom-nav {
+    display: flex !important;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    border-top: 1px solid #e2e8f0;
+    z-index: 90;
+    padding: 0.5rem 0;
+  }
+}
+@media (min-width: 768px) {
+  .mobile-bottom-nav {
+    display: none !important;
+  }
 }
 
 /* Admin specific styles */
