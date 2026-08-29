@@ -2,6 +2,9 @@ import { getSession } from '@/lib/auth'
 import AdminLayoutClient from './AdminLayoutClient'
 import { prisma } from '@/lib/prisma'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await getSession()
 

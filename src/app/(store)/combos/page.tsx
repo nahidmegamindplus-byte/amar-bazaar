@@ -7,6 +7,9 @@ export const metadata = {
   description: 'Save more with our organic grocery combo bundles and family packs.',
 }
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export default async function CombosPage() {
   const products = await prisma.product.findMany({
     where: { isPublished: true },

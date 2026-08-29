@@ -7,6 +7,9 @@ export const metadata = {
   description: 'Complete your order with Cash on Delivery or Mobile Banking.',
 }
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export default async function CheckoutPage() {
   const [deliveryZones, checkoutSettings] = await Promise.all([
     prisma.deliveryZone.findMany({

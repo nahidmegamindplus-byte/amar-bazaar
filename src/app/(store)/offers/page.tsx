@@ -7,6 +7,9 @@ export const metadata = {
   description: 'Handpicked discounted organic products for health and taste.',
 }
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export default async function OffersPage() {
   const products = await prisma.product.findMany({
     where: { isPublished: true, salePrice: { not: null } },

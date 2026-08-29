@@ -7,6 +7,9 @@ export const metadata = {
   description: 'Browse all organic product categories at ShuddhoBazar.',
 }
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export default async function CategoriesPage() {
   const categories = await prisma.category.findMany({
     where: { isActive: true },

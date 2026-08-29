@@ -3,6 +3,9 @@ import { getBrandingSettings } from '@/lib/settings'
 import HomepageClient from './(store)/HomepageClient'
 import StoreLayoutClient from './(store)/StoreLayoutClient'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export default async function RootHomePage() {
   const [
     branding,

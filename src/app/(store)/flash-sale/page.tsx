@@ -7,6 +7,9 @@ export const metadata = {
   description: 'Limited-time discounts on pure and organic grocery items.',
 }
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export default async function FlashSalePage() {
   const products = await prisma.product.findMany({
     where: { isPublished: true, isFlashSale: true },

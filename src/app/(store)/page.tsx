@@ -2,6 +2,9 @@ import { prisma } from '@/lib/prisma'
 import { getBrandingSettings } from '@/lib/settings'
 import HomepageClient from './HomepageClient'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export default async function HomePage() {
   // Fetch everything from DB server-side for SEO
   const [sections, categories, banners, flashSaleProducts, featuredProducts, newProducts, bestSellingProducts, settings] = await Promise.all([
