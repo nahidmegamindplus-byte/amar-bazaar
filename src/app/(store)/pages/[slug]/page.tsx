@@ -11,12 +11,27 @@ export default async function CMSPage({
 }) {
   const { slug } = await params
 
-  const page = await prisma.page.findFirst({
-    where: { slug, isPublished: true },
-  })
+  let page: any = null
+
+  try {
+    page = await prisma.page.findFirst({
+      where: { slug, isPublished: true },
+    })
+  } catch {
+    // DB fallback
+  }
 
   if (!page) {
-    notFound()
+    // Basic fallback pages
+    if (slug === 'about-us') {
+      page = { title: 'About Us', content: '<p>ShuddhoBazar is Bangladesh\'s premium online grocery store specializing in pure organic products.</p>' }
+    } else if (slug === 'contact-us') {
+      page = { title: 'Contact Us', content: '<p>Email: support@shuddhobazar.com<br/>Phone: +880-1234-567890</p>' }
+    } else if (slug === 'faq') {
+      page = { title: 'Frequently Asked Questions', content: '<p>We deliver nationwide across all 64 districts in Bangladesh with Cash on Delivery and Mobile banking.</p>' }
+    } else {
+      notFound()
+    }
   }
 
   return (

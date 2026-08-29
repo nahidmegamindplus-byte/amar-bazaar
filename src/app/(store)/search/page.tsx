@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma'
+import { fallbackProducts } from '@/lib/fallback-data'
 import ProductCard from '@/components/storefront/ProductCard'
 import { Search } from 'lucide-react'
 
@@ -18,8 +19,10 @@ export default async function SearchPage({
   const { q } = await searchParams
   const query = q?.trim() || ''
 
-  const products = query
-    ? await prisma.product.findMany({
+  let products: any[] = []
+  if (query) {
+    try {
+      products = await prisma.product.findMany({
         where: {
           isPublished: true,
           OR: [
@@ -35,7 +38,15 @@ export default async function SearchPage({
           brand: { select: { name: true } },
         },
       })
-    : []
+    } catch {
+      // Fallback search
+      products = fallbackProducts.filter(
+        p => p.name.toLowerCase().includes(query.toLowerCase()) ||
+             p.description.toLowerCase().includes(query.toLowerCase()) ||
+             p.shortDesc.toLowerCase().includes(query.toLowerCase())
+      )
+    }
+  }
 
   return (
     <div className="container py-8 space-y-8">

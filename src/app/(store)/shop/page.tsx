@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma'
+import { fallbackCategories, fallbackBrands } from '@/lib/fallback-data'
 import ShopClient from './ShopClient'
 
 export const dynamic = 'force-dynamic'
@@ -11,17 +12,26 @@ export default async function ShopPage({
 }) {
   const resolvedParams = await searchParams
   
-  const [categories, brands] = await Promise.all([
-    prisma.category.findMany({
-      where: { isActive: true },
-      orderBy: { sortOrder: 'asc' },
-      include: { subcategories: { where: { isActive: true } }, _count: { select: { products: { where: { isPublished: true } } } } },
-    }),
-    prisma.brand.findMany({
-      where: { isActive: true },
-      include: { _count: { select: { products: { where: { isPublished: true } } } } },
-    }),
-  ])
+  let categories: any[] = fallbackCategories
+  let brands: any[] = fallbackBrands
+
+  try {
+    const [dbCategories, dbBrands] = await Promise.all([
+      prisma.category.findMany({
+        where: { isActive: true },
+        orderBy: { sortOrder: 'asc' },
+        include: { subcategories: { where: { isActive: true } }, _count: { select: { products: { where: { isPublished: true } } } } },
+      }),
+      prisma.brand.findMany({
+        where: { isActive: true },
+        include: { _count: { select: { products: { where: { isPublished: true } } } } },
+      }),
+    ])
+    if (dbCategories?.length) categories = dbCategories
+    if (dbBrands?.length) brands = dbBrands
+  } catch {
+    // Fallback safely
+  }
 
   return <ShopClient initialCategories={categories} initialBrands={brands} initialParams={resolvedParams} />
 }

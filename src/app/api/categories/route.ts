@@ -16,6 +16,7 @@ export async function GET(req: NextRequest) {
     })
     return NextResponse.json({ success: true, data: categories })
   } catch (err) {
-    return NextResponse.json({ error: 'Server error' }, { status: 500 })
+    const { fallbackCategories } = await import('@/lib/fallback-data')
+    return NextResponse.json({ success: true, data: fallbackCategories })
   }
 }

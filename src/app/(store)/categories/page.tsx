@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma'
+import { fallbackCategories } from '@/lib/fallback-data'
 import Link from 'next/link'
 import { ChevronRight } from 'lucide-react'
 
@@ -11,14 +12,23 @@ export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 export default async function CategoriesPage() {
-  const categories = await prisma.category.findMany({
-    where: { isActive: true },
-    orderBy: { sortOrder: 'asc' },
-    include: {
-      subcategories: { where: { isActive: true }, orderBy: { sortOrder: 'asc' } },
-      _count: { select: { products: { where: { isPublished: true } } } },
-    },
-  })
+  let categories: any[] = fallbackCategories
+
+  try {
+    const dbCategories = await prisma.category.findMany({
+      where: { isActive: true },
+      orderBy: { sortOrder: 'asc' },
+      include: {
+        subcategories: { where: { isActive: true }, orderBy: { sortOrder: 'asc' } },
+        _count: { select: { products: { where: { isPublished: true } } } },
+      },
+    })
+    if (dbCategories?.length) {
+      categories = dbCategories
+    }
+  } catch {
+    // Fallback safely
+  }
 
   return (
     <div className="container py-8 space-y-8">

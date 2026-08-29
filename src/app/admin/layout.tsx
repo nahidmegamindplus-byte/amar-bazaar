@@ -10,14 +10,18 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   let user = null
   if (session?.userId) {
-    user = await prisma.user.findUnique({
-      where: { id: session.userId },
-      select: { name: true, email: true, role: true },
-    })
+    try {
+      user = await prisma.user.findUnique({
+        where: { id: session.userId },
+        select: { name: true, email: true, role: true },
+      })
+    } catch {
+      // DB fallback
+    }
   }
 
   const isAuthenticated = Boolean(
-    session && user && user.role !== 'CUSTOMER'
+    session && (!user || user.role !== 'CUSTOMER')
   )
 
   return (

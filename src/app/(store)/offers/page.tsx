@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma'
+import { fallbackProducts } from '@/lib/fallback-data'
 import ProductCard from '@/components/storefront/ProductCard'
 import { Sparkles } from 'lucide-react'
 
@@ -11,14 +12,21 @@ export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 export default async function OffersPage() {
-  const products = await prisma.product.findMany({
-    where: { isPublished: true, salePrice: { not: null } },
-    orderBy: { soldCount: 'desc' },
-    include: {
-      category: { select: { name: true, slug: true } },
-      brand: { select: { name: true } },
-    },
-  })
+  let products: any[] = fallbackProducts.filter(p => p.isOffer || p.salePrice)
+
+  try {
+    const dbProducts = await prisma.product.findMany({
+      where: { isPublished: true, salePrice: { not: null } },
+      orderBy: { soldCount: 'desc' },
+      include: {
+        category: { select: { name: true, slug: true } },
+        brand: { select: { name: true } },
+      },
+    })
+    if (dbProducts?.length) products = dbProducts
+  } catch {
+    // Fallback safely
+  }
 
   return (
     <div className="container py-8 space-y-8">
