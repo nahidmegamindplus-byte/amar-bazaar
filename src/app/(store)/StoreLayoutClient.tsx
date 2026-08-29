@@ -118,40 +118,40 @@ export default function StoreLayoutClient({ children, branding, categories }: St
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       {/* Announcement Bar */}
       {branding.announcementActive && branding.announcementText && (
-        <div className="announcement-bar">
+        <div className="announcement-bar" style={{ background: 'linear-gradient(90deg, #15803d, #166534)', color: '#fff', padding: '0.35rem 0', fontSize: '0.75rem', textAlign: 'center', fontWeight: 600 }}>
           <div className="container">
             <span>{branding.announcementText}</span>
           </div>
         </div>
       )}
 
-      {/* Header (Non-sticky on computer/desktop) */}
+      {/* Header (Non-sticky on computer/desktop, compact luxury) */}
       <header className="store-header" style={{ background: '#fff', borderBottom: '1px solid #e2e8f0', position: 'relative', zIndex: 100 }}>
         {/* Top Row */}
-        <div className="container" style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.85rem 1rem' }}>
+        <div className="container" style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', padding: '0.5rem 0.85rem' }}>
           {/* Hamburger - Mobile */}
           <button
             onClick={() => setMobileMenuOpen(true)}
-            style={{ display: 'none', background: 'none', border: 'none', cursor: 'pointer', color: '#475569', padding: '0.25rem' }}
+            style={{ display: 'none', background: 'none', border: 'none', cursor: 'pointer', color: '#475569', padding: '0.2rem' }}
             className="mobile-menu-btn"
           >
-            <Menu size={22} />
+            <Menu size={20} />
           </button>
 
           {/* Logo */}
-          <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
+          <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem', flexShrink: 0 }}>
             {branding.logoUrl ? (
-              <img src={branding.logoUrl} alt={branding.siteName} style={{ height: '2.5rem', width: 'auto' }} />
+              <img src={branding.logoUrl} alt={branding.siteName} style={{ height: '2rem', width: 'auto' }} />
             ) : (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                <div style={{ width: '2.25rem', height: '2.25rem', background: 'linear-gradient(135deg, #16a34a, #15803d)', borderRadius: '0.6rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Leaf size={18} color="#fff" />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                <div style={{ width: '1.9rem', height: '1.9rem', background: 'linear-gradient(135deg, #16a34a, #15803d)', borderRadius: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Leaf size={15} color="#fff" />
                 </div>
                 <div>
-                  <div style={{ fontWeight: 800, fontSize: '1.1rem', color: '#15803d', letterSpacing: '-0.02em', lineHeight: 1 }}>
+                  <div style={{ fontWeight: 800, fontSize: '1rem', color: '#15803d', letterSpacing: '-0.02em', lineHeight: 1 }}>
                     ShuddhoBazar
                   </div>
-                  <div style={{ fontSize: '0.6rem', color: '#64748b', letterSpacing: '0.04em', lineHeight: 1 }}>
+                  <div style={{ fontSize: '0.55rem', color: '#64748b', letterSpacing: '0.04em', lineHeight: 1 }}>
                     PURE & ORGANIC
                   </div>
                 </div>
@@ -160,21 +160,21 @@ export default function StoreLayoutClient({ children, branding, categories }: St
           </Link>
 
           {/* Search Bar - Desktop */}
-          <div style={{ flex: 1, maxWidth: '600px', position: 'relative' }} ref={searchRef}>
+          <div style={{ flex: 1, maxWidth: '520px', position: 'relative' }} ref={searchRef}>
             <form onSubmit={handleSearchSubmit}>
               <div style={{ position: 'relative' }}>
-                <Search size={16} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                <Search size={14} style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
                 <input
                   value={searchQuery}
                   onChange={e => handleSearch(e.target.value)}
                   onFocus={() => setSearchOpen(true)}
                   onBlur={() => setTimeout(() => setSearchOpen(false), 200)}
-                  placeholder="Search for organic honey, spices, oils..."
-                  style={{ width: '100%', padding: '0.7rem 1rem 0.7rem 2.75rem', border: '2px solid #e2e8f0', borderRadius: '0.75rem', fontSize: '0.875rem', outline: 'none', background: '#f8fafc', transition: 'border-color 0.15s' }}
+                  placeholder="Search honey, pure ghee, spices, wood-pressed oils..."
+                  style={{ width: '100%', padding: '0.45rem 0.85rem 0.45rem 2.4rem', border: '1.5px solid #e2e8f0', borderRadius: '0.65rem', fontSize: '0.8rem', outline: 'none', background: '#f8fafc', transition: 'border-color 0.15s' }}
                 />
                 {searchQuery && (
-                  <button type="button" onClick={() => { setSearchQuery(''); setSearchResults([]) }} style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8' }}>
-                    <X size={14} />
+                  <button type="button" onClick={() => { setSearchQuery(''); setSearchResults([]) }} style={{ position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8' }}>
+                    <X size={13} />
                   </button>
                 )}
               </div>
@@ -281,7 +281,7 @@ export default function StoreLayoutClient({ children, branding, categories }: St
 
         {/* Nav Row */}
         <div style={{ borderTop: '1px solid #f1f5f9', background: '#fafafa' }}>
-          <div className="container" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', padding: '0' }}>
+          <div className="container" style={{ display: 'flex', alignItems: 'center', gap: '0.15rem', padding: '0 0.85rem' }}>
             {navLinks.map((link) => (
               <div key={link.href} style={{ position: 'relative' }}
                 onMouseEnter={() => link.hasMega ? setMegaMenu('categories') : null}
@@ -290,11 +290,11 @@ export default function StoreLayoutClient({ children, branding, categories }: St
                 <Link
                   href={link.href}
                   style={{
-                    display: 'flex', alignItems: 'center', gap: '0.3rem',
-                    padding: '0.65rem 0.85rem',
+                    display: 'flex', alignItems: 'center', gap: '0.25rem',
+                    padding: '0.45rem 0.65rem',
                     textDecoration: 'none',
-                    fontSize: '0.85rem',
-                    fontWeight: 500,
+                    fontSize: '0.78rem',
+                    fontWeight: 600,
                     color: link.highlight ? '#f97316' : pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href.split('?')[0])) ? '#16a34a' : '#374151',
                     borderBottom: '2px solid',
                     borderBottomColor: pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href.split('?')[0])) ? '#16a34a' : 'transparent',
@@ -302,28 +302,28 @@ export default function StoreLayoutClient({ children, branding, categories }: St
                     whiteSpace: 'nowrap',
                   }}
                 >
-                  {link.icon && <link.icon size={14} />}
+                  {link.icon && <link.icon size={13} />}
                   {link.label}
-                  {link.hasMega && <ChevronDown size={12} />}
+                  {link.hasMega && <ChevronDown size={11} />}
                 </Link>
 
                 {/* Mega Menu */}
                 {link.hasMega && megaMenu === 'categories' && categories.length > 0 && (
                   <div style={{
                     position: 'absolute', top: '100%', left: 0, background: '#fff',
-                    boxShadow: '0 20px 40px rgba(0,0,0,0.12)', borderRadius: '1rem',
-                    padding: '1.25rem', zIndex: 200, minWidth: '600px',
-                    display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem',
+                    boxShadow: '0 20px 40px rgba(0,0,0,0.12)', borderRadius: '0.85rem',
+                    padding: '1rem', zIndex: 200, minWidth: '550px',
+                    display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.25rem',
                     animation: 'dropdownIn 0.2s ease',
                   }}>
                     {categories.slice(0, 9).map((cat) => (
                       <div key={cat.id}>
-                        <Link href={`/shop?category=${cat.slug}`} style={{ fontWeight: 600, fontSize: '0.875rem', color: '#0f172a', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.5rem' }}>
-                          {cat.image && <img src={cat.image} alt={cat.name} style={{ width: '1.25rem', height: '1.25rem', borderRadius: '0.25rem', objectFit: 'cover' }} />}
+                        <Link href={`/shop?category=${cat.slug}`} style={{ fontWeight: 600, fontSize: '0.8rem', color: '#0f172a', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.35rem', marginBottom: '0.35rem' }}>
+                          {cat.image && <img src={cat.image} alt={cat.name} style={{ width: '1.1rem', height: '1.1rem', borderRadius: '0.25rem', objectFit: 'cover' }} />}
                           {cat.name}
                         </Link>
                         {cat.subcategories?.slice(0, 4).map((sub: any) => (
-                          <Link key={sub.id} href={`/shop?subcategory=${sub.slug}`} style={{ display: 'block', fontSize: '0.8rem', color: '#64748b', textDecoration: 'none', padding: '0.15rem 0', transition: 'color 0.1s' }}
+                          <Link key={sub.id} href={`/shop?subcategory=${sub.slug}`} style={{ display: 'block', fontSize: '0.75rem', color: '#64748b', textDecoration: 'none', padding: '0.1rem 0', transition: 'color 0.1s' }}
                             onMouseOver={e => (e.currentTarget.style.color = '#16a34a')}
                             onMouseOut={e => (e.currentTarget.style.color = '#64748b')}>
                             {sub.name}
@@ -331,8 +331,8 @@ export default function StoreLayoutClient({ children, branding, categories }: St
                         ))}
                       </div>
                     ))}
-                    <div style={{ gridColumn: '1/-1', borderTop: '1px solid #f1f5f9', paddingTop: '0.75rem' }}>
-                      <Link href="/categories" style={{ color: '#16a34a', fontSize: '0.8rem', fontWeight: 600, textDecoration: 'none' }}>
+                    <div style={{ gridColumn: '1/-1', borderTop: '1px solid #f1f5f9', paddingTop: '0.5rem' }}>
+                      <Link href="/categories" style={{ color: '#16a34a', fontSize: '0.75rem', fontWeight: 600, textDecoration: 'none' }}>
                         View all categories →
                       </Link>
                     </div>
@@ -391,30 +391,30 @@ export default function StoreLayoutClient({ children, branding, categories }: St
         {children}
       </main>
 
-      {/* Footer */}
-      <footer style={{ background: branding.footerBg || '#1a2e1a', color: '#94a3b8', paddingTop: '3rem' }}>
-        <div className="container">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem', paddingBottom: '2rem' }}>
+      {/* Footer (Compact luxury style) */}
+      <footer style={{ background: branding.footerBg || '#0f2115', color: '#94a3b8', paddingTop: '1.75rem', borderTop: '1px solid rgba(22, 163, 74, 0.2)' }}>
+        <div className="container" style={{ padding: '0 0.85rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1.5rem', paddingBottom: '1.5rem' }}>
             {/* Brand */}
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-                <div style={{ width: '2rem', height: '2rem', background: '#16a34a', borderRadius: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Leaf size={14} color="#fff" />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.6rem' }}>
+                <div style={{ width: '1.6rem', height: '1.6rem', background: '#16a34a', borderRadius: '0.4rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Leaf size={12} color="#fff" />
                 </div>
-                <span style={{ color: '#fff', fontWeight: 700, fontSize: '1.1rem' }}>ShuddhoBazar</span>
+                <span style={{ color: '#fff', fontWeight: 800, fontSize: '0.95rem' }}>ShuddhoBazar</span>
               </div>
-              <p style={{ fontSize: '0.85rem', lineHeight: 1.7, color: '#64748b' }}>
+              <p style={{ fontSize: '0.78rem', lineHeight: 1.6, color: '#64748b', margin: 0 }}>
                 {branding.footerAbout || 'Premium pure and organic grocery from Bangladesh. Farm to table with trust.'}
               </p>
-              <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
+              <div style={{ display: 'flex', gap: '0.4rem', marginTop: '0.75rem' }}>
                 {branding.facebook && (
-                  <a href={branding.facebook} target="_blank" rel="noopener noreferrer" style={{ width: '2rem', height: '2rem', background: '#1a2e1a', border: '1px solid #2d3748', borderRadius: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', textDecoration: 'none', transition: 'all 0.15s' }}>
-                    <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M9 8H6v4h3v12h5V12h3.642L18 8h-4V6.333C14 5.374 14.5 5 15.7 5H18V0h-3.808C10.595 0 9 1.583 9 4.615V8z"/></svg>
+                  <a href={branding.facebook} target="_blank" rel="noopener noreferrer" style={{ width: '1.75rem', height: '1.75rem', background: '#162e1c', border: '1px solid #2d4533', borderRadius: '0.4rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', textDecoration: 'none', transition: 'all 0.15s' }}>
+                    <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M9 8H6v4h3v12h5V12h3.642L18 8h-4V6.333C14 5.374 14.5 5 15.7 5H18V0h-3.808C10.595 0 9 1.583 9 4.615V8z"/></svg>
                   </a>
                 )}
                 {branding.instagram && (
-                  <a href={branding.instagram} target="_blank" rel="noopener noreferrer" style={{ width: '2rem', height: '2rem', background: '#1a2e1a', border: '1px solid #2d3748', borderRadius: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', textDecoration: 'none', transition: 'all 0.15s' }}>
-                    <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                  <a href={branding.instagram} target="_blank" rel="noopener noreferrer" style={{ width: '1.75rem', height: '1.75rem', background: '#162e1c', border: '1px solid #2d4533', borderRadius: '0.4rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', textDecoration: 'none', transition: 'all 0.15s' }}>
+                    <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
                   </a>
                 )}
               </div>
@@ -422,65 +422,57 @@ export default function StoreLayoutClient({ children, branding, categories }: St
 
             {/* Quick Links */}
             <div>
-              <h4 style={{ color: '#e2e8f0', fontWeight: 600, fontSize: '0.9rem', marginBottom: '1rem' }}>Quick Links</h4>
+              <h4 style={{ color: '#e2e8f0', fontWeight: 700, fontSize: '0.8rem', marginBottom: '0.6rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Shop</h4>
               {[
-                { label: 'Shop', href: '/shop' },
-                { label: 'New Arrivals', href: '/shop?newArrival=true' },
-                { label: 'Best Sellers', href: '/shop?bestSelling=true' },
-                { label: 'Flash Sale', href: '/flash-sale' },
-                { label: 'Combo Deals', href: '/combos' },
+                { label: 'All Products', href: '/shop' },
+                { label: 'Flash Deals', href: '/flash-sale' },
+                { label: 'Combos & Packs', href: '/combos' },
                 { label: 'Track Order', href: '/track-order' },
               ].map(link => (
-                <Link key={link.href} href={link.href} style={{ display: 'block', color: '#64748b', textDecoration: 'none', fontSize: '0.85rem', padding: '0.25rem 0', transition: 'color 0.1s' }}
+                <Link key={link.href} href={link.href} style={{ display: 'block', color: '#94a3b8', textDecoration: 'none', fontSize: '0.78rem', padding: '0.18rem 0', transition: 'color 0.1s' }}
                   onMouseOver={e => (e.currentTarget.style.color = '#4ade80')}
-                  onMouseOut={e => (e.currentTarget.style.color = '#64748b')}>
+                  onMouseOut={e => (e.currentTarget.style.color = '#94a3b8')}>
                   {link.label}
                 </Link>
               ))}
             </div>
 
-            {/* Help */}
+            {/* Help & Policies */}
             <div>
-              <h4 style={{ color: '#e2e8f0', fontWeight: 600, fontSize: '0.9rem', marginBottom: '1rem' }}>Help & Info</h4>
+              <h4 style={{ color: '#e2e8f0', fontWeight: 700, fontSize: '0.8rem', marginBottom: '0.6rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Help & Info</h4>
               {[
-                { label: 'About Us', href: '/pages/about-us' },
+                { label: 'About ShuddhoBazar', href: '/pages/about-us' },
                 { label: 'Contact Us', href: '/pages/contact-us' },
                 { label: 'FAQ', href: '/pages/faq' },
                 { label: 'Return Policy', href: '/pages/return-policy' },
-                { label: 'Privacy Policy', href: '/pages/privacy-policy' },
-                { label: 'Terms & Conditions', href: '/pages/terms-and-conditions' },
+                { label: 'Privacy & Terms', href: '/pages/privacy-policy' },
               ].map(link => (
-                <Link key={link.href} href={link.href} style={{ display: 'block', color: '#64748b', textDecoration: 'none', fontSize: '0.85rem', padding: '0.25rem 0', transition: 'color 0.1s' }}
+                <Link key={link.href} href={link.href} style={{ display: 'block', color: '#94a3b8', textDecoration: 'none', fontSize: '0.78rem', padding: '0.18rem 0', transition: 'color 0.1s' }}
                   onMouseOver={e => (e.currentTarget.style.color = '#4ade80')}
-                  onMouseOut={e => (e.currentTarget.style.color = '#64748b')}>
+                  onMouseOut={e => (e.currentTarget.style.color = '#94a3b8')}>
                   {link.label}
                 </Link>
               ))}
             </div>
 
-            {/* Contact */}
+            {/* Contact & Support */}
             <div>
-              <h4 style={{ color: '#e2e8f0', fontWeight: 600, fontSize: '0.9rem', marginBottom: '1rem' }}>Contact Us</h4>
+              <h4 style={{ color: '#e2e8f0', fontWeight: 700, fontSize: '0.8rem', marginBottom: '0.6rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Customer Care</h4>
               {branding.phone && (
-                <a href={`tel:${branding.phone}`} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#64748b', textDecoration: 'none', fontSize: '0.85rem', marginBottom: '0.75rem' }}>
-                  <Phone size={14} color="#16a34a" /> {branding.phone}
+                <a href={`tel:${branding.phone}`} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#cbd5e1', textDecoration: 'none', fontSize: '0.78rem', marginBottom: '0.4rem' }}>
+                  <Phone size={12} color="#4ade80" /> {branding.phone}
                 </a>
               )}
               {branding.email && (
-                <a href={`mailto:${branding.email}`} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#64748b', textDecoration: 'none', fontSize: '0.85rem', marginBottom: '0.75rem' }}>
-                  <Mail size={14} color="#16a34a" /> {branding.email}
+                <a href={`mailto:${branding.email}`} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#cbd5e1', textDecoration: 'none', fontSize: '0.78rem', marginBottom: '0.4rem' }}>
+                  <Mail size={12} color="#4ade80" /> {branding.email}
                 </a>
               )}
-              {branding.whatsapp && (
-                <a href={`https://wa.me/${branding.whatsapp.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#64748b', textDecoration: 'none', fontSize: '0.85rem' }}>
-                  <MessageCircle size={14} color="#25d366" /> WhatsApp
-                </a>
-              )}
-              <div style={{ marginTop: '1.25rem' }}>
-                <h5 style={{ color: '#e2e8f0', fontSize: '0.85rem', margin: '0 0 0.5rem' }}>Payment Methods</h5>
-                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                  {['COD', 'bKash', 'Nagad', 'Rocket'].map(m => (
-                    <span key={m} style={{ padding: '0.2rem 0.5rem', background: '#0f2818', border: '1px solid #2d3748', borderRadius: '0.3rem', fontSize: '0.7rem', color: '#94a3b8' }}>{m}</span>
+              <div style={{ marginTop: '0.6rem' }}>
+                <div style={{ fontSize: '0.72rem', color: '#64748b', marginBottom: '0.3rem' }}>Supported Payments:</div>
+                <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap' }}>
+                  {['Cash On Delivery', 'bKash', 'Nagad', 'Rocket'].map(m => (
+                    <span key={m} style={{ padding: '0.15rem 0.4rem', background: '#162e1c', border: '1px solid #2d4533', borderRadius: '0.25rem', fontSize: '0.65rem', color: '#cbd5e1' }}>{m}</span>
                   ))}
                 </div>
               </div>
@@ -488,11 +480,11 @@ export default function StoreLayoutClient({ children, branding, categories }: St
           </div>
 
           {/* Bottom bar */}
-          <div style={{ borderTop: '1px solid #2d3748', padding: '1.25rem 0', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '0.5rem' }}>
-            <p style={{ margin: 0, fontSize: '0.8rem', color: '#475569' }}>
+          <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', padding: '0.85rem 0', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '0.5rem' }}>
+            <p style={{ margin: 0, fontSize: '0.75rem', color: '#64748b' }}>
               © {new Date().getFullYear()} ShuddhoBazar. All rights reserved.
             </p>
-            <p style={{ margin: 0, fontSize: '0.8rem', color: '#475569' }}>
+            <p style={{ margin: 0, fontSize: '0.75rem', color: '#64748b' }}>
               Made in Bangladesh 🇧🇩 with ❤️
             </p>
           </div>
