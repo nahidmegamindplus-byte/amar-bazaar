@@ -82,10 +82,12 @@ async function main() {
       data: {
         email: adminEmail,
         name: adminName,
+        phone: '01700000001',
         password: hashedPassword,
         role: 'SUPER_ADMIN',
         status: 'ACTIVE',
         emailVerified: true,
+        phoneVerified: true,
         adminProfile: {
           create: {
             permissions: JSON.stringify(['*']),
@@ -97,6 +99,40 @@ async function main() {
     console.log(`   Password: ${adminPassword}`)
   } else {
     console.log('ℹ️  Admin user already exists')
+  }
+
+  // Demo Customer User
+  const customerEmail = 'user@shuddho.com'
+  const customerPhone = '01700000000'
+  const existingCustomer = await prisma.user.findFirst({ where: { OR: [{ email: customerEmail }, { phone: customerPhone }] } })
+  if (!existingCustomer) {
+    const hashedPassword = await bcrypt.hash('User@123456', 12)
+    await prisma.user.create({
+      data: {
+        email: customerEmail,
+        phone: customerPhone,
+        name: 'Demo Customer',
+        password: hashedPassword,
+        role: 'CUSTOMER',
+        status: 'ACTIVE',
+        emailVerified: true,
+        phoneVerified: true,
+        cart: { create: {} },
+        wishlist: { create: {} },
+        addresses: {
+          create: {
+            name: 'Demo Customer',
+            phone: '01700000000',
+            division: 'Dhaka',
+            district: 'Dhaka',
+            area: 'Dhanmondi',
+            fullAddress: 'House 12, Road 5, Dhanmondi, Dhaka',
+            isDefault: true,
+          }
+        }
+      }
+    })
+    console.log(`✅ Demo Customer created: ${customerEmail} / ${customerPhone}`)
   }
 
   // ============================================================
