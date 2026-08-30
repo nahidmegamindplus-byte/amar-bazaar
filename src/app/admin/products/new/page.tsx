@@ -2,8 +2,9 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Package, ArrowLeft, Upload, Save, CheckCircle2 } from 'lucide-react'
+import { Package, ArrowLeft, Upload, Save, CheckCircle2, Image as ImageIcon } from 'lucide-react'
 import { slugify } from '@/lib/utils'
+import ImageUploader from '@/components/admin/ImageUploader'
 import toast from 'react-hot-toast'
 
 export default function AdminNewProductPage() {
@@ -233,16 +234,14 @@ export default function AdminNewProductPage() {
             3. Product Media & Descriptions
           </h3>
 
-          <div>
-            <label className="form-label text-xs font-bold uppercase text-slate-700">Image URL</label>
-            <input
-              type="url"
-              placeholder="https://images.unsplash.com/photo-..."
-              value={thumbnail}
-              onChange={(e) => setThumbnail(e.target.value)}
-              className="input text-xs rounded-xl"
-            />
-          </div>
+          <ImageUploader
+            label="Product Main Thumbnail Image (মূল ছবি)"
+            value={thumbnail}
+            onChange={setThumbnail}
+            folder="products"
+            aspectRatio="square"
+            helperText="Upload a square high-quality product photo (JPG, PNG, WebP) or paste an image URL."
+          />
 
           <div>
             <label className="form-label text-xs font-bold uppercase text-slate-700">Short Summary</label>

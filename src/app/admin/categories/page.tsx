@@ -1,7 +1,8 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { Tag, Plus, Edit, Trash2, RefreshCw } from 'lucide-react'
+import { Tag, Plus, Edit, Trash2, RefreshCw, X } from 'lucide-react'
 import { slugify } from '@/lib/utils'
+import ImageUploader from '@/components/admin/ImageUploader'
 import toast from 'react-hot-toast'
 
 export default function AdminCategoriesPage() {
@@ -230,16 +231,14 @@ export default function AdminCategoriesPage() {
                 />
               </div>
 
-              <div>
-                <label className="form-label text-xs font-bold uppercase text-slate-700">Image URL</label>
-                <input
-                  type="url"
-                  placeholder="https://..."
-                  value={image}
-                  onChange={(e) => setImage(e.target.value)}
-                  className="input text-xs rounded-xl"
-                />
-              </div>
+              <ImageUploader
+                label="Category Cover / Icon Image"
+                value={image}
+                onChange={setImage}
+                folder="categories"
+                aspectRatio="square"
+                helperText="Upload category thumbnail icon or banner."
+              />
 
               <div>
                 <label className="form-label text-xs font-bold uppercase text-slate-700">Description</label>
