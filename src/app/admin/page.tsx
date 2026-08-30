@@ -5,7 +5,8 @@ import {
   ShoppingBag, TrendingUp, Users, Package, AlertTriangle,
   ArrowUpRight, ArrowDownRight, Clock, CheckCircle2, XCircle,
   Truck, BarChart3, RefreshCw, Eye, Plus, ArrowRight, DollarSign,
-  Percent, CreditCard, Flame, Sparkles, ChevronRight, Phone, ShieldCheck
+  Percent, CreditCard, Flame, Sparkles, ChevronRight, Phone, ShieldCheck,
+  Calendar, Filter
 } from 'lucide-react'
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -28,14 +29,24 @@ const STATUS_BADGE: Record<string, { bg: string; text: string; label: string }> 
 export default function AdminDashboard() {
   const [data, setData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
-  const [timeRange, setTimeRange] = useState<'7' | '30'>('7')
+  const [dateRange, setDateRange] = useState<string>('7days')
+  const [customStart, setCustomStart] = useState<string>('')
+  const [customEnd, setCustomEnd] = useState<string>('')
+  const [showCustomPicker, setShowCustomPicker] = useState<boolean>(false)
 
-  const fetchData = async () => {
+  const fetchData = async (range = dateRange, start = customStart, end = customEnd) => {
     setLoading(true)
     try {
-      const res = await fetch('/api/analytics')
+      const params = new URLSearchParams()
+      params.set('range', range)
+      if (range === 'custom' && start && end) {
+        params.set('startDate', start)
+        params.set('endDate', end)
+      }
+
+      const res = await fetch(`/api/analytics?${params.toString()}`)
       const json = await res.json()
-      if (json.success) {
+      if (json.success && json.data) {
         setData(json.data)
       } else {
         toast.error('Failed to load analytics')
@@ -48,20 +59,22 @@ export default function AdminDashboard() {
   }
 
   useEffect(() => {
-    fetchData()
-  }, [])
+    fetchData(dateRange, customStart, customEnd)
+  }, [dateRange])
 
-  if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[450px] gap-3 text-slate-400">
-        <RefreshCw size={32} className="animate-spin text-emerald-600" />
-        <p className="text-xs font-semibold">Loading real-time store analytics...</p>
-      </div>
-    )
+  const handleApplyCustomDate = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!customStart || !customEnd) {
+      toast.error('Please select both Start and End dates')
+      return
+    }
+    setDateRange('custom')
+    fetchData('custom', customStart, customEnd)
   }
 
   const cards = data?.cards || {}
-  const chartData = timeRange === '7' ? (data?.charts?.last7Days || []) : (data?.charts?.last30Days || [])
+  const rangeInfo = data?.rangeInfo || {}
+  const chartData = data?.chartData || []
   const statusDistribution = data?.statusDistribution || []
   const paymentDistribution = data?.paymentDistribution || []
   const topProducts = data?.topProducts || []
@@ -97,49 +110,140 @@ export default function AdminDashboard() {
             <span>Orders</span>
           </Link>
           <button
-            onClick={fetchData}
-            className="btn bg-white/10 hover:bg-white/20 text-white border border-white/20 btn-sm rounded-xl p-2"
+            onClick={() => fetchData()}
+            className="btn bg-white/10 hover:bg-white/20 text-white border border-white/20 btn-sm rounded-xl p-2 cursor-pointer"
             title="Refresh analytics data"
           >
-            <RefreshCw size={14} />
+            <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
           </button>
         </div>
       </div>
 
-      {/* 2. Top Primary Metrics Cards Grid */}
+      {/* 2. Interactive Date Range Selector Bar */}
+      <div className="card p-4 bg-white rounded-3xl border border-slate-100 shadow-xs space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
+              <Calendar size={16} />
+            </div>
+            <div>
+              <span className="text-xs font-bold text-slate-800">Filter Analytics By Date (তারিখ অনুযায়ী অ্যানালিটিক্স):</span>
+              <div className="text-[11px] text-emerald-700 font-extrabold">
+                Active View: {rangeInfo.rangeLabel || 'Last 7 Days'} ({rangeInfo.startDate} to {rangeInfo.endDate})
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Preset Buttons */}
+          <div className="flex items-center gap-1 overflow-x-auto pb-1 sm:pb-0">
+            {[
+              { id: 'today', label: 'Today (আজকে)' },
+              { id: 'yesterday', label: 'Yesterday (গতকাল)' },
+              { id: '7days', label: '7 Days (৭ দিন)' },
+              { id: '30days', label: '30 Days (৩০ দিন)' },
+              { id: 'thisMonth', label: 'This Month (চলতি মাস)' },
+              { id: 'lastMonth', label: 'Last Month (গত মাস)' },
+              { id: 'all', label: 'All Time' },
+            ].map((p) => (
+              <button
+                key={p.id}
+                type="button"
+                onClick={() => {
+                  setShowCustomPicker(false)
+                  setDateRange(p.id)
+                }}
+                className={`py-1.5 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 ${
+                  dateRange === p.id && !showCustomPicker
+                    ? 'bg-emerald-700 text-white shadow-xs'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
+              >
+                {p.label}
+              </button>
+            ))}
+
+            <button
+              type="button"
+              onClick={() => setShowCustomPicker(!showCustomPicker)}
+              className={`py-1.5 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 flex items-center gap-1 ${
+                showCustomPicker || dateRange === 'custom'
+                  ? 'bg-emerald-700 text-white shadow-xs'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
+            >
+              <Filter size={12} />
+              <span>Custom Date (কাস্টম)</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Custom Date Range Picker Strip */}
+        {showCustomPicker && (
+          <form onSubmit={handleApplyCustomDate} className="pt-3 border-t border-slate-100 flex flex-wrap items-center gap-3 animate-fadeIn">
+            <div className="flex items-center gap-2">
+              <label className="text-xs font-bold text-slate-600">From Date:</label>
+              <input
+                type="date"
+                required
+                value={customStart}
+                onChange={(e) => setCustomStart(e.target.value)}
+                className="input text-xs py-1.5 px-3 rounded-xl bg-slate-50 border-slate-200"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="text-xs font-bold text-slate-600">To Date:</label>
+              <input
+                type="date"
+                required
+                value={customEnd}
+                onChange={(e) => setCustomEnd(e.target.value)}
+                className="input text-xs py-1.5 px-3 rounded-xl bg-slate-50 border-slate-200"
+              />
+            </div>
+            <button
+              type="submit"
+              className="btn btn-primary btn-sm rounded-xl text-xs font-bold px-4 shadow-xs cursor-pointer"
+            >
+              Apply Filter (ফিল্টার করুন)
+            </button>
+          </form>
+        )}
+      </div>
+
+      {/* 3. Top Metrics Cards Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-        {/* Today's Sales */}
+        {/* Selected Period Sales */}
         <div className="card p-3.5 bg-white rounded-2xl border-emerald-100/80 shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Today's Sales</span>
+            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Period Sales</span>
             <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
               <TrendingUp size={15} />
             </div>
           </div>
           <div className="mt-2 space-y-0.5">
             <div className="text-lg sm:text-xl font-extrabold text-slate-900 leading-none">
-              {formatPrice(cards.todaySales || 0)}
+              {formatPrice(cards.rangeSales || 0)}
             </div>
             <div className="text-[10.5px] font-semibold text-emerald-600 flex items-center gap-0.5">
-              <span>{cards.todayOrders || 0} order(s) today</span>
+              <span>{cards.rangeOrders || 0} order(s)</span>
             </div>
           </div>
         </div>
 
-        {/* This Month's Sales */}
+        {/* Today's Sales */}
         <div className="card p-3.5 bg-white rounded-2xl border-blue-100/80 shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Month Sales</span>
+            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Today's Sales</span>
             <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
               <DollarSign size={15} />
             </div>
           </div>
           <div className="mt-2 space-y-0.5">
             <div className="text-lg sm:text-xl font-extrabold text-slate-900 leading-none">
-              {formatPrice(cards.monthSales || 0)}
+              {formatPrice(cards.todaySales || 0)}
             </div>
             <div className="text-[10.5px] font-semibold text-blue-600">
-              Current 30-day period
+              {cards.todayOrders || 0} order(s) today
             </div>
           </div>
         </div>
@@ -178,7 +282,7 @@ export default function AdminDashboard() {
               {cards.pendingOrders || 0}
             </div>
             <div className="text-[10.5px] font-bold text-amber-700 flex items-center gap-0.5">
-              <span>Needs confirmation</span>
+              <span>Needs action</span>
               <ArrowRight size={11} />
             </div>
           </div>
@@ -197,7 +301,7 @@ export default function AdminDashboard() {
               {cards.deliveryRate || 100}%
             </div>
             <div className="text-[10.5px] font-semibold text-cyan-600">
-              {cards.deliveredOrders || 0} delivered orders
+              {cards.deliveredOrders || 0} delivered
             </div>
           </div>
         </div>
@@ -215,43 +319,26 @@ export default function AdminDashboard() {
               {formatPrice(cards.aov || 0)}
             </div>
             <div className="text-[10.5px] font-semibold text-slate-400">
-              Per customer checkout
+              Per checkout
             </div>
           </div>
         </div>
       </div>
 
-      {/* 3. Interactive Main Sales Trend Chart & Status Donut */}
+      {/* 4. Main Sales Trend Chart for Selected Range & Status Donut */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Sales Trend Chart (8 Cols) */}
         <div className="lg:col-span-8 card p-5 bg-white rounded-3xl border border-slate-100 shadow-xs space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-100">
+          <div className="flex items-center justify-between pb-2 border-b border-slate-100">
             <div>
-              <h3 className="font-extrabold text-base text-slate-900">Revenue & Order Volume Trend</h3>
-              <p className="text-xs text-slate-400">Daily sales velocity and customer checkout patterns</p>
+              <h3 className="font-extrabold text-base text-slate-900">
+                Revenue & Velocity Chart ({rangeInfo.rangeLabel || 'Selected Range'})
+              </h3>
+              <p className="text-xs text-slate-400">Daily sales breakdown and purchase volume</p>
             </div>
-
-            {/* Time range switch pills */}
-            <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-xl text-xs font-bold self-start sm:self-auto">
-              <button
-                type="button"
-                onClick={() => setTimeRange('7')}
-                className={`py-1 px-3 rounded-lg transition-all cursor-pointer ${
-                  timeRange === '7' ? 'bg-white text-emerald-700 shadow-xs' : 'text-slate-500 hover:text-slate-900'
-                }`}
-              >
-                Last 7 Days
-              </button>
-              <button
-                type="button"
-                onClick={() => setTimeRange('30')}
-                className={`py-1 px-3 rounded-lg transition-all cursor-pointer ${
-                  timeRange === '30' ? 'bg-white text-emerald-700 shadow-xs' : 'text-slate-500 hover:text-slate-900'
-                }`}
-              >
-                Last 30 Days
-              </button>
-            </div>
+            <span className="badge badge-green font-bold text-xs">
+              {formatPrice(cards.rangeSales || 0)} Total
+            </span>
           </div>
 
           {/* Area Chart Container */}
@@ -275,7 +362,7 @@ export default function AdminDashboard() {
                 />
                 <Tooltip
                   formatter={(value: any) => [formatPrice(Number(value) || 0), 'Revenue']}
-                  labelFormatter={(l) => `Date: ${l}`}
+                  labelFormatter={(l) => `Period: ${l}`}
                   contentStyle={{
                     backgroundColor: '#0f172a',
                     borderRadius: '12px',
@@ -298,11 +385,11 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Order Status Breakdown (4 Cols) */}
+        {/* Order Status Breakdown in Range (4 Cols) */}
         <div className="lg:col-span-4 card p-5 bg-white rounded-3xl border border-slate-100 shadow-xs space-y-4 flex flex-col justify-between">
           <div className="pb-2 border-b border-slate-100">
-            <h3 className="font-extrabold text-base text-slate-900">Order Status Share</h3>
-            <p className="text-xs text-slate-400">Distribution across fulfillment stages</p>
+            <h3 className="font-extrabold text-base text-slate-900">Status Distribution</h3>
+            <p className="text-xs text-slate-400">In {rangeInfo.rangeLabel || 'selected period'}</p>
           </div>
 
           {/* Donut Chart */}
@@ -329,8 +416,8 @@ export default function AdminDashboard() {
               </PieChart>
             </ResponsiveContainer>
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-              <span className="text-xl font-extrabold text-slate-900">{cards.totalOrders || 0}</span>
-              <span className="text-[9px] font-bold uppercase text-slate-400">Total</span>
+              <span className="text-xl font-extrabold text-slate-900">{cards.rangeOrders || 0}</span>
+              <span className="text-[9px] font-bold uppercase text-slate-400">Orders</span>
             </div>
           </div>
 
@@ -349,21 +436,21 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* 4. Secondary Row: Payment Methods + Abandoned Cart Recovery Funnel */}
+      {/* 5. Payment Methods + Cart Recovery Funnel */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* Payment Methods */}
         <div className="card p-5 bg-white rounded-3xl border border-slate-100 shadow-xs space-y-3">
           <div className="flex items-center justify-between pb-2 border-b border-slate-100">
             <h4 className="font-extrabold text-sm text-slate-900 flex items-center gap-1.5">
               <CreditCard size={16} className="text-emerald-600" />
-              <span>Payment Methods</span>
+              <span>Payment Breakdown</span>
             </h4>
-            <span className="text-xs text-slate-400 font-semibold">{cards.totalOrders || 0} total</span>
+            <span className="text-xs text-slate-400 font-semibold">{cards.rangeOrders || 0} in period</span>
           </div>
 
           <div className="space-y-2">
             {paymentDistribution.map((pm: any) => {
-              const pct = cards.totalOrders > 0 ? Math.round((pm.count / cards.totalOrders) * 100) : 0
+              const pct = cards.rangeOrders > 0 ? Math.round((pm.count / cards.rangeOrders) * 100) : 0
               return (
                 <div key={pm.name} className="space-y-1 text-xs">
                   <div className="flex justify-between font-bold text-slate-700">
@@ -398,7 +485,7 @@ export default function AdminDashboard() {
                 <span className="badge badge-green font-bold text-xs">{cards.recoveredIncomplete || 0} Recovered</span>
               </div>
               <p className="text-xs text-slate-500 leading-relaxed">
-                Total <strong>{cards.incompleteOrders || 0}</strong> abandoned checkout sessions tracked. Automatic lead capture helps recover up to 25% lost sales.
+                Total <strong>{cards.incompleteOrders || 0}</strong> abandoned checkout sessions in period.
               </p>
             </div>
           </div>
@@ -418,7 +505,7 @@ export default function AdminDashboard() {
             <div className="flex items-center justify-between pb-2 border-b border-slate-100">
               <h4 className="font-extrabold text-sm text-slate-900 flex items-center gap-1.5">
                 <Package size={16} className="text-rose-600" />
-                <span>Inventory Health</span>
+                <span>Inventory Alerts</span>
               </h4>
               <span className="badge badge-gray font-mono text-[11px]">{cards.totalProducts || 0} Published</span>
             </div>
@@ -449,7 +536,7 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* 5. Bottom Row: Top Selling Products Leaderboard + Recent Live Orders Feed */}
+      {/* 6. Top Selling Products Leaderboard + Period Orders Feed */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Top Selling Products (5 Cols) */}
         <div className="lg:col-span-5 card p-5 bg-white rounded-3xl border border-slate-100 shadow-xs space-y-4">
@@ -500,12 +587,12 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Recent Live Orders Feed (7 Cols) */}
+        {/* Orders in Period Feed (7 Cols) */}
         <div className="lg:col-span-7 card p-5 bg-white rounded-3xl border border-slate-100 shadow-xs space-y-4">
           <div className="flex items-center justify-between pb-2 border-b border-slate-100">
             <div>
-              <h3 className="font-extrabold text-base text-slate-900">Recent Customer Orders</h3>
-              <p className="text-xs text-slate-400">Latest incoming purchases awaiting dispatch</p>
+              <h3 className="font-extrabold text-base text-slate-900">Orders in Selected Period</h3>
+              <p className="text-xs text-slate-400">Showing purchases placed during {rangeInfo.rangeLabel || 'this period'}</p>
             </div>
             <Link href="/admin/orders" className="btn btn-outline btn-sm rounded-xl text-xs font-bold flex items-center gap-1">
               <span>All Orders</span>
@@ -528,7 +615,7 @@ export default function AdminDashboard() {
               <tbody className="divide-y divide-slate-100">
                 {recentOrders.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="py-8 text-center text-xs text-slate-400">No orders placed yet.</td>
+                    <td colSpan={6} className="py-8 text-center text-xs text-slate-400">No orders in this date range.</td>
                   </tr>
                 ) : (
                   recentOrders.slice(0, 7).map((ord: any) => {

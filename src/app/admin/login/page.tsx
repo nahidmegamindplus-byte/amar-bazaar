@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
-import { Eye, EyeOff, Leaf } from 'lucide-react'
+import { Eye, EyeOff, Leaf, Sparkles, ArrowRight, ShieldCheck } from 'lucide-react'
 
 export default function AdminLoginPage() {
   const router = useRouter()
@@ -10,33 +10,43 @@ export default function AdminLoginPage() {
   const [showPw, setShowPw] = useState(false)
   const [form, setForm] = useState({ email: '', password: '' })
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const executeAdminLogin = async (email: string, pass: string) => {
     setLoading(true)
+    const toastId = toast.loading('Signing in to Admin Panel...')
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ email, password: pass }),
       })
       const data = await res.json()
-      if (!res.ok) {
-        toast.error(data.error || 'Login failed')
+      if (!res.ok || !data.success) {
+        toast.error(data.error || 'Login failed', { id: toastId })
         return
       }
       const adminRoles = ['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'ORDER_MANAGER', 'PRODUCT_MANAGER', 'CONTENT_MANAGER', 'DELIVERY_MANAGER', 'SUPPORT_STAFF']
       if (!adminRoles.includes(data.user.role)) {
-        toast.error('Access denied. Not an admin account.')
+        toast.error('Access denied. Not an admin account.', { id: toastId })
         return
       }
-      toast.success('Welcome back!')
+      toast.success(`Welcome back, ${data.user.name || 'Admin'}! 🎉`, { id: toastId })
       router.push('/admin')
       router.refresh()
     } catch {
-      toast.error('Network error')
+      toast.error('Network error during login', { id: toastId })
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    executeAdminLogin(form.email, form.password)
+  }
+
+  const handleInstantDemoLogin = () => {
+    setForm({ email: 'admin@shuddho.com', password: 'Admin@123456' })
+    executeAdminLogin('admin@shuddho.com', 'Admin@123456')
   }
 
   return (
@@ -44,21 +54,21 @@ export default function AdminLoginPage() {
       <div style={{ width: '100%', maxWidth: '420px' }}>
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <div style={{ width: '4rem', height: '4rem', background: 'linear-gradient(135deg, #16a34a, #15803d)', borderRadius: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}>
+          <div style={{ width: '4rem', height: '4rem', background: 'linear-gradient(135deg, #16a34a, #15803d)', borderRadius: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem', boxShadow: '0 10px 25px rgba(22, 163, 74, 0.3)' }}>
             <Leaf size={28} color="#fff" />
           </div>
           <h1 style={{ color: '#f1f5f9', fontSize: '1.5rem', fontWeight: 800, margin: '0 0 0.25rem' }}>ShuddhoBazar</h1>
-          <p style={{ color: '#64748b', fontSize: '0.875rem', margin: 0 }}>Admin Panel — Sign in to continue</p>
+          <p style={{ color: '#64748b', fontSize: '0.875rem', margin: 0 }}>Admin Panel — Operations Control</p>
         </div>
 
         {/* Card */}
-        <div style={{ background: '#fff', borderRadius: '1.25rem', padding: '2rem', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}>
+        <div style={{ background: '#fff', borderRadius: '1.5rem', padding: '2rem', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}>
           <form onSubmit={handleSubmit}>
             <div style={{ marginBottom: '1.25rem' }}>
-              <label className="form-label">Email Address</label>
+              <label className="form-label text-xs font-bold uppercase text-slate-700">Email Address *</label>
               <input
                 type="email"
-                className="input"
+                className="input text-sm rounded-xl"
                 placeholder="admin@shuddho.com"
                 value={form.email}
                 onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
@@ -67,11 +77,11 @@ export default function AdminLoginPage() {
               />
             </div>
             <div style={{ marginBottom: '1.5rem' }}>
-              <label className="form-label">Password</label>
+              <label className="form-label text-xs font-bold uppercase text-slate-700">Password *</label>
               <div style={{ position: 'relative' }}>
                 <input
                   type={showPw ? 'text' : 'password'}
-                  className="input"
+                  className="input text-sm rounded-xl"
                   placeholder="••••••••"
                   value={form.password}
                   onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
@@ -90,34 +100,33 @@ export default function AdminLoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="btn btn-primary btn-xl"
+              className="btn btn-primary btn-xl font-extrabold rounded-xl"
               style={{ width: '100%' }}
             >
               {loading ? 'Signing in...' : 'Sign In to Admin Panel'}
             </button>
           </form>
 
-          {/* Quick Demo Login Buttons */}
+          {/* 1-Click Instant Demo Login Button */}
           <div style={{ marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: '1px solid #f1f5f9' }}>
-            <div style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: '#64748b', letterSpacing: '0.05em', marginBottom: '0.75rem', textAlign: 'center' }}>
-              ⚡ 1-Click Quick Demo Login
+            <div style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: '#64748b', letterSpacing: '0.05em', marginBottom: '0.75rem', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem' }}>
+              <Sparkles size={13} color="#f59e0b" />
+              <span>1-Click Instant Demo Login</span>
             </div>
             
             <button
               type="button"
-              onClick={() => {
-                setForm({ email: 'admin@shuddho.com', password: 'Admin@123456' })
-                toast.success('Admin credentials filled!')
-              }}
+              disabled={loading}
+              onClick={handleInstantDemoLogin}
               style={{
                 width: '100%',
-                padding: '0.65rem 1rem',
-                borderRadius: '0.75rem',
-                border: '1.5px dashed #16a34a',
+                padding: '0.75rem 1rem',
+                borderRadius: '0.85rem',
+                border: '2px solid #16a34a',
                 background: '#f0fdf4',
                 color: '#15803d',
-                fontWeight: 600,
-                fontSize: '0.825rem',
+                fontWeight: 700,
+                fontSize: '0.85rem',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
@@ -126,12 +135,17 @@ export default function AdminLoginPage() {
                 transition: 'all 0.15s',
               }}
             >
-              <span>👑 Super Admin Demo</span>
-              <span style={{ fontSize: '0.75rem', opacity: 0.8 }}>admin@shuddho.com</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span>👑</span>
+                <span>Super Admin 1-Click Login</span>
+              </div>
+              <span style={{ fontSize: '0.7rem', background: '#16a34a', color: '#fff', padding: '0.15rem 0.5rem', borderRadius: '0.35rem', fontWeight: 800 }}>
+                Instant Access
+              </span>
             </button>
 
-            <div style={{ background: '#f8fafc', padding: '0.6rem 0.8rem', borderRadius: '0.5rem', fontSize: '0.75rem', color: '#475569', textAlign: 'center', border: '1px solid #e2e8f0' }}>
-              Password: <strong style={{ color: '#0f172a' }}>Admin@123456</strong>
+            <div style={{ background: '#f8fafc', padding: '0.5rem 0.8rem', borderRadius: '0.5rem', fontSize: '0.75rem', color: '#64748b', textAlign: 'center', border: '1px solid #e2e8f0' }}>
+              Email: <strong style={{ color: '#0f172a' }}>admin@shuddho.com</strong> • Pass: <strong style={{ color: '#0f172a' }}>Admin@123456</strong>
             </div>
           </div>
         </div>
