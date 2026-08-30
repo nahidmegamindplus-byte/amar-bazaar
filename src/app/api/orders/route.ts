@@ -33,8 +33,12 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
     const parsed = checkoutSchema.safeParse(body)
 
+    // Ensure items are provided
     if (!parsed.success) {
       return NextResponse.json({ error: 'Invalid order data', details: parsed.error.flatten() }, { status: 400 })
+    }
+    if (!parsed.data.items || parsed.data.items.length === 0) {
+      return NextResponse.json({ error: 'Cart is empty' }, { status: 400 })
     }
 
     const data = parsed.data
@@ -43,9 +47,11 @@ export async function POST(req: NextRequest) {
     let subtotal = 0
     let discount = 0
     const orderItems: any[] = []
-
+    
+    // Validate each cart item before processing
     for (const item of data.items) {
       let product: any = null
+      let isFallback = false
       try {
         product = await prisma.product.findFirst({
           where: { OR: [{ id: item.productId }, { slug: item.productId }] },
@@ -57,10 +63,38 @@ export async function POST(req: NextRequest) {
 
       if (!product) {
         const { fallbackProducts } = await import('@/lib/fallback-data')
-        product = fallbackProducts.find((p: any) => p.id === item.productId || p.slug === item.productId)
+        const fbProduct = fallbackProducts.find((p: any) => p.id === item.productId || p.slug === item.productId)
+        
+        if (fbProduct) {
+          // Check if it exists in DB by slug
+          product = await prisma.product.findUnique({
+            where: { slug: fbProduct.slug },
+            include: { variants: true }
+          })
+          
+          if (product) {
+            // Map item to the real DB IDs
+            item.productId = product.id
+            if (item.variantId) {
+              const fbVariant = fbProduct.variants?.find((v:any) => v.id === item.variantId)
+              if (fbVariant) {
+                const dbVariant = product.variants?.find((v:any) => v.name === fbVariant.name)
+                if (dbVariant) {
+                  item.variantId = dbVariant.id
+                } else {
+                  item.variantId = undefined // fallback if variant name changed
+                }
+              }
+            }
+          } else {
+            isFallback = true
+            product = fbProduct
+          }
+        }
       }
 
       if (!product) {
+        isFallback = true
         product = {
           id: item.productId,
           name: 'Organic Authentic Product',
@@ -73,6 +107,28 @@ export async function POST(req: NextRequest) {
         }
       }
 
+      // Upsert fallback product so foreign key constraints pass during order creation
+      if (isFallback) {
+        try {
+          await prisma.product.upsert({
+            where: { id: product.id },
+            update: { },
+            create: {
+              id: product.id,
+              name: product.name,
+              slug: product.slug || product.id,
+              regularPrice: product.regularPrice || 500,
+              salePrice: product.salePrice,
+              stock: product.stock || 99,
+              thumbnail: product.thumbnail,
+              isPublished: true
+            }
+          })
+        } catch (err) {
+          console.error('Failed to upsert fallback product:', err)
+        }
+      }
+
       let unitPrice = product.regularPrice || 500
       let salePrice = product.salePrice || undefined
       let availableStock = product.stock || 99
@@ -81,6 +137,25 @@ export async function POST(req: NextRequest) {
       if (item.variantId && product.variants) {
         const variant = product.variants.find((v: any) => v.id === item.variantId)
         if (variant) {
+          // Upsert fallback variant
+          if (isFallback) {
+            try {
+              await prisma.productVariant.upsert({
+                where: { id: variant.id },
+                update: { },
+                create: {
+                  id: variant.id,
+                  productId: product.id,
+                  name: variant.name,
+                  price: variant.price || product.regularPrice,
+                  salePrice: variant.salePrice,
+                  stock: variant.stock || 99
+                }
+              })
+            } catch (err) {
+              console.error('Failed to upsert fallback variant:', err)
+            }
+          }
           unitPrice = variant.price || product.regularPrice
           salePrice = variant.salePrice || product.salePrice || undefined
           availableStock = variant.stock || 99
@@ -88,11 +163,16 @@ export async function POST(req: NextRequest) {
         }
       }
 
+      // Ensure sufficient stock
+      if (availableStock < item.quantity) {
+        return NextResponse.json({ error: `Insufficient stock for product ${product.name}` }, { status: 400 })
+      }
+
       const effectivePrice = salePrice || unitPrice
       const itemTotal = effectivePrice * item.quantity
       const itemDiscount = salePrice ? (unitPrice - salePrice) * item.quantity : 0
 
-      subtotal += itemTotal + itemDiscount
+      subtotal += unitPrice * item.quantity
       discount += itemDiscount
 
       orderItems.push({
@@ -111,9 +191,13 @@ export async function POST(req: NextRequest) {
 
     // Delivery charge (server-side calculation)
     let deliveryCharge = 0
+    // Guard against undefined zoneId and missing zone data
     if (data.zoneId) {
       const zone = await prisma.deliveryZone.findUnique({ where: { id: data.zoneId }, include: { rates: true } })
-      if (zone && zone.rates.length > 0) {
+      if (!zone) {
+        return NextResponse.json({ error: 'Invalid delivery zone' }, { status: 400 })
+      }
+      if (zone && zone.rates && zone.rates.length > 0) {
         const rate = zone.rates.find((r) => r.isActive)
         if (rate) {
           const orderSubtotal = subtotal - discount
@@ -200,6 +284,11 @@ export async function POST(req: NextRequest) {
           }
         }
 
+        // Validate supported payment methods (currently only COD is fully supported)
+        if (data.paymentMethod !== 'COD') {
+          return NextResponse.json({ error: `Payment method ${data.paymentMethod} not supported in demo` }, { status: 400 })
+        }
+
         // Create order
         const newOrder = await tx.order.create({
           data: {
@@ -223,7 +312,7 @@ export async function POST(req: NextRequest) {
             taxAmount,
             total,
             paymentMethod: data.paymentMethod,
-            paymentStatus: data.paymentMethod === 'COD' ? 'PENDING' : 'PENDING',
+            paymentStatus: 'PENDING',
             status: 'PENDING',
             items: { create: orderItems },
             statusHistory: {
@@ -285,8 +374,11 @@ export async function POST(req: NextRequest) {
 
     return response
   } catch (err) {
+    // Log detailed error information for debugging
     console.error('Order creation error:', err)
-    return NextResponse.json({ error: 'Failed to place order' }, { status: 500 })
+    // Return a more descriptive error response when possible
+    const message = err instanceof Error ? err.message : String(err)
+    return NextResponse.json({ error: 'Failed to place order', details: message }, { status: 500 })
   }
 }
 
